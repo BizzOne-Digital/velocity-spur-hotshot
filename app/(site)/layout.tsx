@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import Preloader from "@/components/layout/Preloader";
 import { getServices, getSettings } from "@/lib/data";
 import { SITE_URL } from "@/lib/constants";
 
@@ -36,6 +37,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* Skip the intro screen for the rest of the session once it has played. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(sessionStorage.getItem("vsh_preloader_seen"))document.documentElement.dataset.preloaderSeen="1"}catch(e){}`,
+        }}
+      />
+      <Preloader />
       <Header logoUrl={settings.logoUrl} phone={settings.phone} email={settings.email} />
       <main id="main" className="overflow-x-clip">
         {children}

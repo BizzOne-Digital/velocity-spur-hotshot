@@ -163,3 +163,8 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
 }
+
+/* Intro screen: hidden before paint on repeat visits in the same session */
+html[data-preloader-seen] .preloader {
+  display: none;
+}
