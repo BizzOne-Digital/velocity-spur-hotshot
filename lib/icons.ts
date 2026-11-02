@@ -1,0 +1,67 @@
+import {
+  Boxes,
+  Building2,
+  CalendarClock,
+  Cog,
+  Construction,
+  Factory,
+  Flame,
+  Forklift,
+  Handshake,
+  HardHat,
+  Headset,
+  Layers,
+  type LucideIcon,
+  MapPin,
+  MessagesSquare,
+  Package,
+  Route,
+  ShieldCheck,
+  Shuffle,
+  Timer,
+  Tractor,
+  Truck,
+  Warehouse,
+  Wheat,
+  Wrench,
+  Zap,
+  BadgeCheck,
+  Container,
+} from "lucide-react";
+
+/** Icon keys that admins can assign to services/packages. */
+export const ICONS: Record<string, LucideIcon> = {
+  truck: Truck,
+  construction: Construction,
+  "hard-hat": HardHat,
+  forklift: Forklift,
+  factory: Factory,
+  flame: Flame,
+  tractor: Tractor,
+  wheat: Wheat,
+  timer: Timer,
+  handshake: Handshake,
+  package: Package,
+  boxes: Boxes,
+  container: Container,
+  warehouse: Warehouse,
+  building: Building2,
+  wrench: Wrench,
+  cog: Cog,
+  shield: ShieldCheck,
+  headset: Headset,
+  messages: MessagesSquare,
+  route: Route,
+  "map-pin": MapPin,
+  calendar: CalendarClock,
+  layers: Layers,
+  zap: Zap,
+  shuffle: Shuffle,
+  badge: BadgeCheck,
+};
+
+export const ICON_KEYS = Object.keys(ICONS);
+
+export function getIcon(key?: string | null): LucideIcon {
+  return (key && ICONS[key]) || Truck;
+}
