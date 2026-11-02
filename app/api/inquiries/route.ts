@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { INQUIRY_TYPES } from "@/lib/constants";
 import { clientIp, isEmail, oneOf, rateLimit, str } from "@/lib/validation";
 import Inquiry from "@/models/Inquiry";
+import { notifyNewLead } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -34,6 +35,22 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     await Inquiry.create({ ...data, status: "New" });
+    await notifyNewLead({
+      kind: "Inquiry",
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      summary: `${data.type} inquiry${data.company ? ` from ${data.company}` : ""}`,
+      rows: [
+        ["Name", data.name],
+        ["Company", data.company],
+        ["Email", data.email],
+        ["Phone", data.phone],
+        ["Inquiry type", data.type],
+        ["Message", data.message],
+      ],
+      adminPath: "/admin/inquiries",
+    });
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (err) {
     console.error("Inquiry submission failed", err);

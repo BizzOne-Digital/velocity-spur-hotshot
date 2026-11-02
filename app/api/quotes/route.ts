@@ -6,6 +6,7 @@ import { ATTACHMENT_TYPES, MAX_UPLOAD_BYTES, QUOTE_ATTACHMENT_FOLDER } from "@/l
 import { clientIp, isEmail, isPhone, oneOf, rateLimit, str } from "@/lib/validation";
 import QuoteRequest from "@/models/QuoteRequest";
 import StoredUpload from "@/models/StoredUpload";
+import { notifyNewLead } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -70,6 +71,7 @@ export async function POST(req: Request) {
     await connectDB();
 
     let attachmentUrl = "";
+    let attachment: { filename: string; contentType: string; content: Buffer } | undefined;
     if (hasFile && ext) {
       const buffer = Buffer.from(await (file as File).arrayBuffer());
       const filename = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${ext}`;
@@ -81,6 +83,7 @@ export async function POST(req: Request) {
         data: buffer,
       });
       attachmentUrl = `/api/admin/attachments/${filename}`;
+      attachment = { filename, contentType: (file as File).type, content: buffer };
     }
 
     await QuoteRequest.create({
@@ -89,6 +92,32 @@ export async function POST(req: Request) {
       requestedPickupDate: pickupDate,
       attachmentUrl,
       status: "New",
+    });
+
+    await notifyNewLead({
+      kind: "Quote Request",
+      name: data.contactName,
+      email: data.email,
+      phone: data.phone,
+      summary: `${data.freightType}: ${data.pickupLocation} to ${data.deliveryLocation} (${data.urgency})`,
+      rows: [
+        ["Contact name", data.contactName],
+        ["Company", data.companyName],
+        ["Email", data.email],
+        ["Phone", data.phone],
+        ["Pickup location", data.pickupLocation],
+        ["Delivery location", data.deliveryLocation],
+        ["Requested pickup date", data.requestedPickupDate],
+        ["Freight type", data.freightType],
+        ["Estimated weight", data.estimatedWeight],
+        ["Dimensions", data.dimensions],
+        ["Trailer requirement", data.trailerRequirement],
+        ["Urgency", data.urgency],
+        ["Description", data.description],
+        ["Notes", data.notes],
+      ],
+      adminPath: "/admin/quotes",
+      attachment,
     });
 
     return NextResponse.json({ success: true }, { status: 201 });
