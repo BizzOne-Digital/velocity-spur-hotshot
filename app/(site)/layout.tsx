@@ -15,8 +15,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     description:
       "Alberta-based hotshot trucking and transportation for construction materials, equipment and commercial freight.",
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.svg`,
-    image: `${SITE_URL}/logo.svg`,
+    logo: `${SITE_URL}/images/logo.webp`,
+    image: `${SITE_URL}/images/logo.webp`,
     telephone: settings.phone,
     email: settings.email,
     slogan: settings.tagline,

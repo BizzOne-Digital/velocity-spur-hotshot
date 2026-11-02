@@ -66,10 +66,10 @@ export default function Preloader() {
 
           <div className="relative flex w-[min(22rem,80vw)] flex-col items-center">
             <motion.img
-              src="/logo.svg"
+              src="/images/logo.webp?v=2"
               alt=""
-              width={320}
-              height={230}
+              width={640}
+              height={475}
               className="h-28 w-auto drop-shadow-[0_0_24px_rgba(255,121,0,0.45)] sm:h-32"
               initial={reduce ? false : { opacity: 0, scale: 0.85, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

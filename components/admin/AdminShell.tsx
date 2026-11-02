@@ -46,7 +46,7 @@ export default function AdminShell({ email, children }: { email: string; childre
   const sidebar = (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-        <Image src="/logo.svg" alt="Velocity Spur Hotshot" width={64} height={46} unoptimized className="h-11 w-auto" />
+        <Image src="/images/logo.webp?v=2" alt="Velocity Spur Hotshot" width={64} height={48} unoptimized className="h-11 w-auto" />
         <div>
           <p className="text-sm font-bold leading-tight text-white">Velocity Spur</p>
           <p className="text-xs text-brand">Admin Portal</p>
