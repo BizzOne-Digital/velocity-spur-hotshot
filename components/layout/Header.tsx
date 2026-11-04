@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Mail, Menu, Phone, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
@@ -15,6 +16,9 @@ export default function Header({ logoUrl, phone, email }: Props) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -34,7 +38,8 @@ export default function Header({ logoUrl, phone, email }: Props) {
     };
   }, [open]);
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
   const tel = phone.replace(/[^\d+]/g, "");
 
   return (
@@ -66,7 +71,9 @@ export default function Header({ logoUrl, phone, email }: Props) {
                   href={l.href}
                   aria-current={isActive(l.href) ? "page" : undefined}
                   className={`relative block px-3 py-2 font-display text-[15px] font-bold italic uppercase tracking-wide transition-colors ${
-                    isActive(l.href) ? "text-white" : "text-white/75 hover:text-brand"
+                    isActive(l.href)
+                      ? "text-white"
+                      : "text-white/75 hover:text-brand"
                   }`}
                 >
                   {l.label}
@@ -83,7 +90,11 @@ export default function Header({ logoUrl, phone, email }: Props) {
         </nav>
 
         <div className="flex items-center gap-3">
-          <ButtonLink href="/request-quote" size="sm" className="hidden sm:inline-flex">
+          <ButtonLink
+            href="/request-quote"
+            size="sm"
+            className="hidden sm:inline-flex"
+          >
             Get a Quote
           </ButtonLink>
           <button
@@ -99,83 +110,115 @@ export default function Header({ logoUrl, phone, email }: Props) {
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="mobile-menu"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site menu"
-            className="fixed inset-0 z-[60] xl:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <button
-              type="button"
-              aria-label="Close menu"
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setOpen(false)}
-            />
-            <motion.div
-              className="bg-industrial absolute inset-y-0 right-0 flex w-full max-w-sm flex-col border-l border-brand/50 shadow-[-10px_0_40px_rgba(255,121,0,0.15)]"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-                <Logo src={logoUrl} className="h-16 w-auto" onClick={() => setOpen(false)} />
+      {/* Portalled to <body>: the header's backdrop-filter would otherwise trap this
+          fixed overlay inside the header's own height. */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                id="mobile-menu"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Site menu"
+                className="fixed inset-0 z-[60] xl:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
-                  className="grid h-11 w-11 place-items-center rounded-md border border-white/15 text-white hover:border-brand hover:text-brand"
                   aria-label="Close menu"
-                  autoFocus
+                  className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                  onClick={() => setOpen(false)}
+                />
+                <motion.div
+                  className="bg-industrial absolute inset-y-0 right-0 flex w-full max-w-sm flex-col border-l border-brand/50 shadow-[-10px_0_40px_rgba(255,121,0,0.15)]"
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{
+                    type: "tween",
+                    duration: 0.3,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                 >
-                  <X className="h-6 w-6" aria-hidden />
-                </button>
-              </div>
-              <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-5 py-6">
-                <ul className="space-y-1">
-                  {NAV_LINKS.map((l, i) => (
-                    <motion.li
-                      key={l.href}
-                      initial={{ opacity: 0, x: 24 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 * i + 0.1 }}
+                  <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+                    <Logo
+                      src={logoUrl}
+                      className="h-16 w-auto"
+                      onClick={() => setOpen(false)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      className="grid h-11 w-11 place-items-center rounded-md border border-white/15 text-white hover:border-brand hover:text-brand"
+                      aria-label="Close menu"
+                      autoFocus
                     >
-                      <Link
-                        href={l.href}
-                        onClick={() => setOpen(false)}
-                        aria-current={isActive(l.href) ? "page" : undefined}
-                        className={`flex items-center justify-between border-l-[3px] px-4 py-3.5 font-display text-2xl font-bold italic uppercase tracking-wide transition ${
-                          isActive(l.href)
-                            ? "border-brand bg-brand/10 text-white"
-                            : "border-transparent text-white/80 hover:border-brand/50 hover:text-brand"
-                        }`}
-                      >
-                        {l.label}
-                      </Link>
-                    </motion.li>
-                  ))}
-                </ul>
-              </nav>
-              <div className="space-y-4 border-t border-white/10 px-5 py-6">
-                <ButtonLink href="/request-quote" className="w-full" onClick={() => setOpen(false)}>
-                  Request a Quote
-                </ButtonLink>
-                <a href={`tel:${tel}`} className="flex items-center gap-3 text-white/85 hover:text-brand">
-                  <Phone className="h-5 w-5 text-brand" aria-hidden /> {phone}
-                </a>
-                <a href={`mailto:${email}`} className="flex items-center gap-3 break-all text-white/85 hover:text-brand">
-                  <Mail className="h-5 w-5 shrink-0 text-brand" aria-hidden /> {email}
-                </a>
-              </div>
-            </motion.div>
-          </motion.div>
+                      <X className="h-6 w-6" aria-hidden />
+                    </button>
+                  </div>
+                  <nav
+                    aria-label="Mobile"
+                    className="flex-1 overflow-y-auto px-5 py-6"
+                  >
+                    <ul className="space-y-1">
+                      {NAV_LINKS.map((l, i) => (
+                        <motion.li
+                          key={l.href}
+                          initial={{ opacity: 0, x: 24 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.05 * i + 0.1 }}
+                        >
+                          <Link
+                            href={l.href}
+                            onClick={() => setOpen(false)}
+                            aria-current={isActive(l.href) ? "page" : undefined}
+                            className={`flex items-center justify-between border-l-[3px] px-4 py-3.5 font-display text-2xl font-bold italic uppercase tracking-wide transition ${
+                              isActive(l.href)
+                                ? "border-brand bg-brand/10 text-white"
+                                : "border-transparent text-white/80 hover:border-brand/50 hover:text-brand"
+                            }`}
+                          >
+                            {l.label}
+                          </Link>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </nav>
+                  <div className="space-y-4 border-t border-white/10 px-5 py-6">
+                    <ButtonLink
+                      href="/request-quote"
+                      className="w-full"
+                      onClick={() => setOpen(false)}
+                    >
+                      Request a Quote
+                    </ButtonLink>
+                    <a
+                      href={`tel:${tel}`}
+                      className="flex items-center gap-3 text-white/85 hover:text-brand"
+                    >
+                      <Phone className="h-5 w-5 text-brand" aria-hidden />{" "}
+                      {phone}
+                    </a>
+                    <a
+                      href={`mailto:${email}`}
+                      className="flex items-center gap-3 break-all text-white/85 hover:text-brand"
+                    >
+                      <Mail
+                        className="h-5 w-5 shrink-0 text-brand"
+                        aria-hidden
+                      />{" "}
+                      {email}
+                    </a>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </header>
   );
 }

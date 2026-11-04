@@ -30,7 +30,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     "Calgary",
   ],
   plannedExpansion: ["Saskatchewan", "British Columbia"],
-  socials: { facebook: "https://www.facebook.com/share/1EAGn11Bx5/", instagram: "", linkedin: "", youtube: "" },
+  socials: { facebook: "https://www.facebook.com/share/1EAGn11Bx5/", instagram: "https://www.instagram.com/velocityspurhotshot/", linkedin: "", youtube: "" },
 };
 
 type SectionInput = Partial<SectionContent> & { sectionKey: string };
